@@ -1,0 +1,31 @@
+CREATE TABLE mt564_events (
+    event_reference VARCHAR(35) NOT NULL,
+    financial_instrument_id VARCHAR(35) NOT NULL,
+    sender_bic VARCHAR(11) NOT NULL,
+
+    version_number INT,
+    business_hash VARCHAR(64),
+    related_message_reference VARCHAR(35),
+    corporate_action_event_id VARCHAR(35),
+    corporate_action_event_type VARCHAR(4),
+    mandatory_voluntary_indicator VARCHAR(4),
+    event_processing_status VARCHAR(4),
+    event_status_code VARCHAR(4),
+    official_corporate_action_event_id VARCHAR(35),
+    link_event_id VARCHAR(35),
+    safekeeping_account VARCHAR(35),
+    place_of_safekeeping VARCHAR(35),
+    event_creation_datetime TIMESTAMP,
+    effective_date DATE,
+    record_date DATE,
+    ex_date DATE,
+    announcement_date DATE,
+    response_deadline DATE,
+    general_meeting_date DATE,
+    narrative TEXT,
+    market_disclosure_flag BOOLEAN,
+    created_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now(),
+
+    PRIMARY KEY (event_reference, financial_instrument_id, sender_bic)
+);

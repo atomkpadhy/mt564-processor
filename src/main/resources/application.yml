@@ -1,0 +1,4 @@
+app:
+  cron: "0 0/5 * * * *" # every 5 minutes
+  mt564-endpoint: "http://remote-service/api/mt564-events"
+  kafka-topic: "mt564-events"
