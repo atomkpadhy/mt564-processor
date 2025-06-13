@@ -1,16 +1,16 @@
 package com.mt564.processing.svc.config;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.mt564.processing.svc.model.dto.Mt564EventDto;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +33,17 @@ public class KafkaConfig {
     }
 
     @Bean
+    public ConsumerFactory<String, Mt564EventDto> getConsumerFactory() {
+        Map<String, Object> consumerProps = new HashMap<>();
+        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "mt564-group");
+        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        consumerProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100); // ✅ batch size
+        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        return new DefaultKafkaConsumerFactory<>(consumerProps);
+    }
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Mt564EventDto> kafkaBatchListenerContainerFactory(
             ConsumerFactory<String, Mt564EventDto> consumerFactory) {
 
@@ -40,6 +51,7 @@ public class KafkaConfig {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         factory.setBatchListener(true); // Enable batch mode
+        factory.getContainerProperties().setPollTimeout(3000);
         return factory;
     }
 
